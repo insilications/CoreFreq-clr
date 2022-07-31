@@ -2,30 +2,39 @@
 # Copyright (C) 2015-2022 CYRIL INGENIERIE
 # Licenses: GPL2
 
-CC ?= cc
+CC = gcc
 WARNING = -Wall -Wfatal-errors
 PWD ?= $(shell pwd)
 KERNELDIR ?= /lib/modules/$(shell uname -r)/build
-PREFIX ?= /usr
+PREFIX = /usr
 UBENCH = 0
-CORE_COUNT ?= 256
+CORE_COUNT = 64
 TASK_ORDER = 5
-MAX_FREQ_HZ ?= 6575000000
-MSR_CORE_PERF_UCC ?= MSR_IA32_APERF
-MSR_CORE_PERF_URC ?= MSR_IA32_MPERF
-ARCH_PMC ?=
+MAX_FREQ_HZ = 5300000000
+MSR_CORE_PERF_UCC = MSR_CORE_PERF_FIXED_CTR1
+MSR_CORE_PERF_URC = MSR_CORE_PERF_FIXED_CTR2
+OPTIM_LVL = 3
+CFLAGS = -O3 -march=skylake -mtune=skylake -Wl,-O2 -falign-functions=32 -mprefer-vector-width=256 -fuse-ld=bfd -fno-semantic-interposition -fno-stack-protector -malign-data=cacheline -pipe
+KCFLAGS = -O3 -march=skylake -mtune=skylake -Wl,-O2 -falign-functions=32 -mprefer-vector-width=256 -fuse-ld=bfd -fno-semantic-interposition -fno-stack-protector -malign-data=cacheline -pipe
+V=1
+
+# MSR_CORE_PERF_UCC ?= MSR_IA32_APERF
+# MSR_CORE_PERF_URC ?= MSR_IA32_MPERF
+ARCH_PMC = PCU
+HWM_CHIPSET = COMPATIBLE
+DELAY_TSC = 1
 
 obj-m := corefreqk.o
 ccflags-y :=	-D CORE_COUNT=$(CORE_COUNT) \
 		-D TASK_ORDER=$(TASK_ORDER) \
-		-D MAX_FREQ_HZ=$(MAX_FREQ_HZ)
+		-D MAX_FREQ_HZ=$(MAX_FREQ_HZ) -O3 -march=skylake -mtune=skylake -Wl,-O2 -falign-functions=32 -mprefer-vector-width=256 -fuse-ld=bfd -fno-semantic-interposition -fno-stack-protector -malign-data=cacheline -pipe
 ccflags-y += $(WARNING)
 
 ifeq ($(OPTIM_LVL),0)
-OPTIM_FLG = -O$(OPTIM_LVL)
+OPTIM_FLG = -O$(OPTIM_LVL) -O3 -march=skylake -mtune=skylake -Wl,-O2 -falign-functions=32 -mprefer-vector-width=256 -fuse-ld=bfd -fno-semantic-interposition -fno-stack-protector -malign-data=cacheline -pipe
 ccflags-y += -fno-inline
 else ifneq ($(OPTIM_LVL),)
-OPTIM_FLG = -O$(OPTIM_LVL)
+OPTIM_FLG = -O$(OPTIM_LVL) -O3 -march=skylake -mtune=skylake -Wl,-O2 -falign-functions=32 -mprefer-vector-width=256 -fuse-ld=bfd -fno-semantic-interposition -fno-stack-protector -malign-data=cacheline -pipe
 ccflags-y += -D OPTIM_LVL=$(OPTIM_LVL)
 ccflags-y += $(OPTIM_FLG)
 endif
