@@ -20774,6 +20774,7 @@ static int CoreFreqK_HotPlug_CPU_Online(unsigned int cpu)
 
 	MatchPeerForUpService(&PUBLIC(RO(Proc))->Service, cpu);
 
+#ifdef CONFIG_PM_SLEEP
 	/* Start the collect timer dedicated to this CPU iff not STR resuming */
    if (CoreFreqK.ResumeFromSuspend == false)
    {
@@ -20787,6 +20788,7 @@ static int CoreFreqK_HotPlug_CPU_Online(unsigned int cpu)
 					NULL, 0);
     }
    }
+#endif /* CONFIG_PM_SLEEP */
 #if defined(CONFIG_CPU_IDLE) && LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
    if (PUBLIC(RO(Proc))->Registration.Driver.CPUidle & REGISTRATION_ENABLE) {
 	struct cpuidle_device *device = per_cpu_ptr(CoreFreqK.IdleDevice, cpu);
@@ -20822,6 +20824,7 @@ static int CoreFreqK_HotPlug_CPU_Offline(unsigned int cpu)
 	PUBLIC(RO(Proc))->CPU.OnLine--;
 	BITSET(LOCKLESS, PUBLIC(RO(Core, AT(cpu)))->OffLine, OS);
 
+#ifdef CONFIG_PM_SLEEP
 	/*		Seek for an alternate Service Processor.	*/
    if (CoreFreqK.ResumeFromSuspend == false) {
     if ((cpu == PUBLIC(RO(Proc))->Service.Core)
@@ -20855,6 +20858,7 @@ static int CoreFreqK_HotPlug_CPU_Offline(unsigned int cpu)
 	PUBLIC(RO(Proc))->Service.Hybrid = Seek_Topology_Hybrid_Core(cpu);
     }
    }
+#endif /* CONFIG_PM_SLEEP */
 #ifdef CONFIG_CPU_FREQ
 	Policy_Aggregate_Turbo();
 #endif /* CONFIG_CPU_FREQ */
